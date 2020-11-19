@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Alura.ListaLeitura.HttpClients;
+using System;
 
 namespace Alura.ListaLeitura.WebApp
 {
@@ -36,6 +38,11 @@ namespace Alura.ListaLeitura.WebApp
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
             }).AddEntityFrameworkStores<AuthDbContext>();
+
+            services.AddHttpClient<LivroApiClient>(client =>
+            {
+                client.BaseAddress = new Uri("http://localhost:7000/api/livros/");
+            });
 
             services.ConfigureApplicationCookie(options => {
                 options.LoginPath = "/Usuario/Login";

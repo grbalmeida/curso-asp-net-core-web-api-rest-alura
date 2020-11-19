@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System;
 using System.Threading.Tasks;
+using Alura.ListaLeitura.HttpClients;
 
 namespace Alura.ListaLeitura.WebApp.Controllers
 {
@@ -13,13 +14,12 @@ namespace Alura.ListaLeitura.WebApp.Controllers
     public class LivroController : Controller
     {
         private readonly IRepository<Livro> _repo;
-        private readonly HttpClient _httpClient;
+        private readonly LivroApiClient _api;
 
-        public LivroController(IRepository<Livro> repository)
+        public LivroController(IRepository<Livro> repository, LivroApiClient api)
         {
             _repo = repository;
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("http://localhost:7000/api/");
+            _api = api;
         }
 
         [HttpGet]
@@ -41,12 +41,10 @@ namespace Alura.ListaLeitura.WebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult ImagemCapa(int id)
+        public async Task<IActionResult> ImagemCapa(int id)
         {
-            byte[] img = _repo.All
-                .Where(l => l.Id == id)
-                .Select(l => l.ImagemCapa)
-                .FirstOrDefault();
+            var img = await _api.GetCapaLivroAsync(id);
+
             if (img != null)
             {
                 return File(img, "image/png");
@@ -57,10 +55,7 @@ namespace Alura.ListaLeitura.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Detalhes(int id)
         {
-            var resposta = await _httpClient.GetAsync($"Livros/{id}");
-            resposta.EnsureSuccessStatusCode();
-
-            var livro = await resposta.Content.ReadAsAsync<LivroApi>();
+            var livro = await _api.GetLivroAsync(id);
 
             if (livro == null)
             {
