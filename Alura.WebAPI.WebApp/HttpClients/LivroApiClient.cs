@@ -1,5 +1,4 @@
 ﻿using Alura.ListaLeitura.Modelos;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -28,6 +27,12 @@ namespace Alura.ListaLeitura.HttpClients
             resposta.EnsureSuccessStatusCode();
 
             return await resposta.Content.ReadAsByteArrayAsync();
+        }
+
+        public async Task DeleteLivroAsync(int id)
+        {
+            var resposta = await _httpClient.DeleteAsync($"{id}");
+            resposta.EnsureSuccessStatusCode();
         }
     }
 }
