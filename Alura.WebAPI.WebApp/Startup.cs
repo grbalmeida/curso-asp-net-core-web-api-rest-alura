@@ -25,6 +25,8 @@ namespace Alura.ListaLeitura.WebApp
                 options.UseSqlServer(Configuration.GetConnectionString("AuthDB"));
             });
 
+            services.AddHttpContextAccessor();
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {

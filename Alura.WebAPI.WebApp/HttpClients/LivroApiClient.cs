@@ -1,15 +1,16 @@
 ﻿using Alura.ListaLeitura.Modelos;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Alura.ListaLeitura.HttpClients
 {
-    public class LivroApiClient
+    public class LivroApiClient : BaseClient
     {
         private readonly HttpClient _httpClient;
 
-        public LivroApiClient(HttpClient httpClient)
+        public LivroApiClient(HttpClient httpClient, IHttpContextAccessor accessor) : base(httpClient, accessor)
         {
             _httpClient = httpClient;
         }
@@ -78,11 +79,6 @@ namespace Alura.ListaLeitura.HttpClients
             }
 
             return content;
-        }
-
-        private string EnvolveComAspasDuplas(string valor)
-        {
-            return $"\"{valor}\"";
         }
     }
 }

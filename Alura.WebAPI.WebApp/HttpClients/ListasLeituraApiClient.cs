@@ -1,15 +1,16 @@
 ﻿using Alura.ListaLeitura.Modelos;
+using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Lista = Alura.ListaLeitura.Modelos.ListaLeitura;
 
 namespace Alura.ListaLeitura.HttpClients
 {
-    public class ListasLeituraApiClient
+    public class ListasLeituraApiClient : BaseClient
     {
         private readonly HttpClient _httpClient;
 
-        public ListasLeituraApiClient(HttpClient httpClient)
+        public ListasLeituraApiClient(HttpClient httpClient, IHttpContextAccessor accessor) : base(httpClient, accessor)
         {
             _httpClient = httpClient;
         }
