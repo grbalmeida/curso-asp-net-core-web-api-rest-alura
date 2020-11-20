@@ -1,4 +1,5 @@
 ﻿using Alura.ListaLeitura.Modelos;
+using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -33,6 +34,54 @@ namespace Alura.ListaLeitura.HttpClients
         {
             var resposta = await _httpClient.DeleteAsync($"{id}");
             resposta.EnsureSuccessStatusCode();
+        }
+
+        public async Task PostLivroAsync(LivroUpload model)
+        {
+            var content = CreateMultipartFormDataContent(model);
+            var resposta = await _httpClient.PostAsync("", content);
+            resposta.EnsureSuccessStatusCode();
+        }
+
+        public async Task PutLivroAsync(LivroUpload model)
+        {
+            var content = CreateMultipartFormDataContent(model);
+            var resposta = await _httpClient.PutAsync("", content);
+            resposta.EnsureSuccessStatusCode();
+        }
+
+        private HttpContent CreateMultipartFormDataContent([FromForm] LivroUpload model)
+        {
+            var content = new MultipartFormDataContent();
+
+            content.Add(new StringContent(model.Titulo ?? ""), EnvolveComAspasDuplas("titulo"));
+            content.Add(new StringContent(model.Subtitulo ?? ""), EnvolveComAspasDuplas("subtitulo"));
+            content.Add(new StringContent(model.Resumo ?? ""), EnvolveComAspasDuplas("resumo"));
+            content.Add(new StringContent(model.Autor ?? ""), EnvolveComAspasDuplas("autor"));
+            content.Add(new StringContent(model.Lista.ParaString()), EnvolveComAspasDuplas("lista"));
+
+            if (model.Id > 0)
+            {
+                content.Add(new StringContent(model.Id.ToString()), EnvolveComAspasDuplas("id"));
+            }
+
+            if (model.Capa != null)
+            {
+                var imagemContent = new ByteArrayContent(model.Capa.ConvertToBytes());
+                imagemContent.Headers.Add("content-type", "image/png");
+                content.Add(
+                    imagemContent,
+                    EnvolveComAspasDuplas("capa"),
+                    EnvolveComAspasDuplas("capa.png")
+                );
+            }
+
+            return content;
+        }
+
+        private string EnvolveComAspasDuplas(string valor)
+        {
+            return $"\"{valor}\"";
         }
     }
 }
