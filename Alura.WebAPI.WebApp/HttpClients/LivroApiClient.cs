@@ -1,6 +1,8 @@
 ﻿using Alura.ListaLeitura.Modelos;
+using Alura.ListaLeitura.Seguranca;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Alura.ListaLeitura.HttpClients
@@ -8,10 +10,12 @@ namespace Alura.ListaLeitura.HttpClients
     public class LivroApiClient
     {
         private readonly HttpClient _httpClient;
+        private readonly AuthApiClient _auth;
 
-        public LivroApiClient(HttpClient httpClient)
+        public LivroApiClient(HttpClient httpClient, AuthApiClient auth)
         {
             _httpClient = httpClient;
+            _auth = auth;
         }
 
         public async Task<LivroApi> GetLivroAsync(int id)
@@ -24,6 +28,11 @@ namespace Alura.ListaLeitura.HttpClients
 
         public async Task<byte[]> GetCapaLivroAsync(int id)
         {
+            var token = await _auth.PostLoginAsync(new LoginModel { Login = "Lucas", Password = "123" });
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
             var resposta = await _httpClient.GetAsync($"{id}/capa");
             resposta.EnsureSuccessStatusCode();
 
